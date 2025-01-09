@@ -3,11 +3,15 @@ import { getPost } from "@/sanity/lib/queries";
 import dayjs from "dayjs";
 import { PortableText } from "next-sanity";
 import { notFound } from "next/navigation";
-import { clsx } from "clsx";
 import Link from "next/link";
 import { Heading, Subheading } from "@/lib/Headings";
 
 
+
+interface Categories {
+  title: string;
+  slug: string;
+}
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -47,7 +51,7 @@ export default async function Page({ params }: PageProps) {
             )}
             {Array.isArray(post.categories) && (
               <div className="flex flex-wrap gap-2">
-                {post.categories.map((category: any) => (
+                {post.categories.map((category:Categories) => (
                   <Link
                     key={category.slug}
                     href={`/blog?category=${category.slug}`}
