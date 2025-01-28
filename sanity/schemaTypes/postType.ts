@@ -50,6 +50,14 @@ export const postType = defineType({
       name: 'body',
       type: 'blockContent',
     }),
+    defineField({
+      name: 'excerpt',
+      type: 'text',
+    }),
+    defineField({
+      name:'publishDate',
+      type: 'datetime',
+    }),
   ],
  preview: {
     select: {

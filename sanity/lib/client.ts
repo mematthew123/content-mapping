@@ -8,6 +8,7 @@ export const client = createClient({
   dataset,
   apiVersion,
   useCdn: isDevelopment ? false : true,
+  token: process.env.SANITY_AUTH_TOKEN,
 })
 
 export async function sanityFetch<const QueryString extends string>({

@@ -77,7 +77,6 @@ export type Post = {
   title?: string;
   slug?: Slug;
   author?: {
-    image: any;
     _ref: string;
     _type: "reference";
     _weak?: boolean;
@@ -281,3 +280,112 @@ export type SanityImageMetadata = {
 
 export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | Post | Author | Category | Slug | BlockContent | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata;
 export declare const internalGroqTypeReferenceTo: unique symbol;
+// Source: ./sanity/lib/queries.ts
+// Variable: TOTAL_POSTS_QUERY
+// Query: count(*[  _type == "post"  && defined(slug.current)  && (isFeatured != true || defined($category))  && select(defined($category) => $category in categories[]->slug.current, true)])
+export type TOTAL_POSTS_QUERYResult = number;
+// Variable: POSTS_QUERY
+// Query: *[  _type == "post"  && defined(slug.current)  && select(defined($category) => $category in categories[]->slug.current, true)]|order(publishedAt desc)[$startIndex...$endIndex]{  title,  "slug": slug.current,  mainImage,  publishedAt,    "author": author->{name}}
+export type POSTS_QUERYResult = Array<{
+  title: string | null;
+  slug: string | null;
+  mainImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  } | null;
+  publishedAt: string | null;
+  author: {
+    name: string | null;
+  } | null;
+}>;
+// Variable: POST_QUERY
+// Query: *[  _type == "post"  && slug.current == $slug][0]{  publishedAt,  title,  mainImage,  body,  author->{    name,    image,  },  categories[]->{    title,    "slug": slug.current,  }}
+export type POST_QUERYResult = {
+  publishedAt: string | null;
+  title: string | null;
+  mainImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  } | null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "normal";
+    listItem?: "bullet";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+    _key: string;
+  }> | null;
+  author: {
+    name: string | null;
+    image: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+  } | null;
+  categories: Array<{
+    title: string | null;
+    slug: string | null;
+  }> | null;
+} | null;
+// Variable: CATEGORIES_QUERY
+// Query: *[  _type == "category"  && count(*[_type == "post" && defined(slug.current) && ^._id in categories[]._ref]) > 0]|order(title asc){  title,  "slug": slug.current,}
+export type CATEGORIES_QUERYResult = Array<{
+  title: string | null;
+  slug: string | null;
+}>;
+
+// Query TypeMap
+import "@sanity/client";
+declare module "@sanity/client" {
+  interface SanityQueries {
+    "count(*[\n  _type == \"post\"\n  && defined(slug.current)\n  && (isFeatured != true || defined($category))\n  && select(defined($category) => $category in categories[]->slug.current, true)\n])": TOTAL_POSTS_QUERYResult;
+    "*[\n  _type == \"post\"\n  && defined(slug.current)\n  && select(defined($category) => $category in categories[]->slug.current, true)\n]|order(publishedAt desc)[$startIndex...$endIndex]{\n  title,\n  \"slug\": slug.current,\n  mainImage,\n  publishedAt,\n    \"author\": author->{name}\n\n}": POSTS_QUERYResult;
+    "*[\n  _type == \"post\"\n  && slug.current == $slug\n][0]{\n  publishedAt,\n  title,\n  mainImage,\n  body,\n  author->{\n    name,\n    image,\n  },\n  categories[]->{\n    title,\n    \"slug\": slug.current,\n  }\n}\n": POST_QUERYResult;
+    "*[\n  _type == \"category\"\n  && count(*[_type == \"post\" && defined(slug.current) && ^._id in categories[]._ref]) > 0\n]|order(title asc){\n  title,\n  \"slug\": slug.current,\n}": CATEGORIES_QUERYResult;
+  }
+}
